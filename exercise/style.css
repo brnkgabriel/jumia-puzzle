@@ -135,6 +135,10 @@ input[type="submit"] {
   display: none;
 }
 
+.formDiv.active {
+  display: block;
+}
+
 .keyboard-line {
   width: 100%;
   display: flex;

@@ -177,15 +177,19 @@ $(window).on("load", function () {
     }
   }
   const GAME = Game.ready();
-
+  var interval = null
   function handleMove() {
     var keys = $('.grid button');
     $.each(keys, function (key, val) {
+      console.log('interval')
       var innerText = $(this).text();
-      $(this).css('background-image', 'url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg)').attr('draggable', true).attr('ondragstart', 'this.click()');
+      if (innerText) {
+        $(this).css('background-image', 'url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg)').attr('draggable', true).attr('ondragstart', 'this.click()');
+        clearInterval(interval)
+      }
     });
   }
-  setInterval(function () {
+  interval = setInterval(function () {
     handleMove();
   }, 100);
 

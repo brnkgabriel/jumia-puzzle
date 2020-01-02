@@ -45,22 +45,16 @@ State.handleMove = function () {
     var innerText = key.textContent
     key.setAttribute('draggable', true)
     key.setAttribute('ondragstart', 'this.click()')
-    key.setAttribute('style', 'background-image:url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg')
+    if (innerText) {
+      key.setAttribute('style', 'background-image:url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg')
+    }
   })
-  // var keys = $('.grid button')
-  // $.each(keys, function (key, val) {
-  //   var innerText = $(this).text()
-  //   console.log('innerText', innerText)
-  //   $(this).css('background-image', 'url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg').attr('draggable', true).attr('ondragstart', 'this.click()')
-  // })
 }
 
 State.ready = function () {
   return new State([
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
+    [0, 0, 0, 0], [0, 0, 0, 0],
+    [0, 0, 0, 0], [0, 0, 0, 0]
   ], 0, 0, 'ready')
 }
 
@@ -98,14 +92,22 @@ var Game = function (state) {
   this.tick = this.tick.bind(this)
   this.render()
   this.handleClickBox = this.handleClickBox.bind(this)
+
+  this.timerTicker = document.getElementById('timerTicker')
+  this.form = document.querySelector('#game-over')
+  this.formDiv = document.querySelector('.formDiv')
 }
 
 Game.ready = function () { return new Game(State.ready()) }
 
 Game.prototype.tick = function () {
-  var timeS = parseInt($('#timerTicker').val(), 0)
+  // var timeS = parseInt($('#timerTicker').val(), 0)
+  // timeS += 1
+  // $('#timerTicker').val(timeS)
+
+  var timeS = parseInt(this.timerTicker.value, 0)
   timeS += 1
-  $('#timerTicker').val(timeS)
+  this.timerTicker.value = timeS
   document.getElementById('time').textContent = `Time: ${timeS}`
 }
 
@@ -133,15 +135,38 @@ Game.prototype.handleClickBox = function (box) {
           grid: newGrid,
           move: this.state.move + 1
         })
-        State.handleMove()
       }
     }
   }.bind(this)
 }
 
-Game.prototype.render = function () {
+Game.prototype.newButton = function (status) {
+  var self = this
+  var newButton = document.createElement('button')
+  newButton.setAttribute('draggable', true)
+  newButton.setAttribute('ondragstart', 'this.click()')
+  
+  if (status === 'ready') newButton.textContent = 'Play'
+  if (status === 'ready') newButton.setAttribute('id', 'playButton')
+  if (status === 'playing') newButton.textContent = 'Reset'
+  if (status === 'won') newButton.textContent = 'Play'
+  if (status === 'won') newButton.setAttribute('id', 'playButton')
 
-  const { grid, move, time, status } = this.state
+  newButton.addEventListener('click', () => {
+    clearInterval(this.tickId)
+    // $('#timerTicker').val(0)
+    // $('.formDiv').fadeOut(300)
+    self.formDiv.classList.remove('active')
+    self.timerTicker.value = 0
+    this.tickId = setInterval(this.tick, 1000)
+    this.setState(State.start())
+  })
+
+  return newButton
+}
+
+Game.prototype.render = function () {
+  const { grid, move, status } = this.state
   const newGrid = document.createElement('div')
   newGrid.className = 'grid'
   for (let i = 0; i < 4; i++) {
@@ -156,46 +181,38 @@ Game.prototype.render = function () {
   }
 
   document.querySelector('.grid').replaceWith(newGrid)
-  const newButton = document.createElement('button')
-  newButton.setAttribute('draggable', true)
-  newButton.setAttribute('ondragstart', 'this.click()')
-  if (status === 'ready') newButton.textContent = 'Play'
-  if (status === 'ready') newButton.setAttribute('id', 'playButton')
-  if (status === 'playing') newButton.textContent = 'Reset'
-  if (status === 'won') newButton.textContent = 'Play'
-  if (status === 'won') newButton.setAttribute('id', 'playButton')
+  const newButton = this.newButton(status)
 
-  newButton.addEventListener('click', () => {
-    clearInterval(this.tickId)
-    $('#timerTicker').val(0)
-    $('.formDiv').fadeOut(300)
-    this.tickId = setInterval(this.tick, 1000)
-    this.setState(State.start())
-  })
   document.querySelector('.footer button').replaceWith(newButton)
   document.getElementById('move').textContent = `Moves: ${move}`
-  $('#movesB').val(move)
+  document.getElementById('movesB').value = move
+  // $('#movesB').val(move)
+
   if (status === 'won') {
-    var moves = $('movesB').val()
-    var timeInSecs = $('#timerTicker').val()
-    $('.howToPlay').hide()
-    var nameT = $('#name').val()
-    var phoneT = $('#phone').val()
-    if (nameT != '' && phoneT != '') {
-      $('#game-over').submit()
-    } else {
-      $('.formDiv').fadeIn(400)
-    }
+    // var moves = $('movesB').val()
+    // var timeInSecs = $('#timerTicker').val()
+    document.querySelector('.howToPlay').style.display = 'none'
+    // $('.howToPlay').hide()
+    // var nameT = $('#name').val()
+    var nameT = document.getElementById('name').value
+    // var phoneT = $('#phone').val()
+    var phoneT = document.getElementById('phone').value
+    // if (nameT != '' && phoneT != '') { this.form.submit() }
+    // else { $('.formDiv').fadeIn(400)}
+    // else { this.formDiv.classList.add('active') }
+    this.formDiv.classList.add('active')
 
     document.querySelector('.message').textContent = 'You win!'
   } else {
     document.querySelector('.message').textContent = ''
   }
+  State.handleMove()
 }
 
 var Main = function () {
   this.tbody = document.querySelector('#highScoresBody')
   this.form = document.querySelector('#game-over')
+  this.formDiv = document.querySelector('.formDiv')
 
   this.firebaseConfig = {
     apiKey: "AIzaSyAA8dQEt-yZnDyY3Lra8lndRJ3LWNYVW0o",
@@ -207,6 +224,7 @@ var Main = function () {
     appId: "1:295115190934:web:de0b33b53a514c3c"
   }
   this.db = null
+  this.interval = null
   this.GAME = Game.ready()
 }
 
@@ -223,10 +241,12 @@ Main.prototype.listeners = function () {
 }
 
 Main.prototype.moveListener = function () {
-  // setInterval(function () { State.handleMove() }, 100)
+  var self = this
+  // this.interval = setInterval(function () { State.handleMove(self.interval) }, 100)
 }
 
 Main.prototype.keyListeners = function () {
+  var self = this
   $('.keyboard-button').not('.special').click(function (e) {
     e.preventDefault()
     var textK = $(this).text()
@@ -290,9 +310,10 @@ Main.prototype.keyListeners = function () {
     if (phone.length != 10 || name == '') {
       $('.error').fadeIn(300)
     } else {
-      sendData()
+      self.sendData()
   
-      $('.formDiv').fadeOut(300)
+      // $('.formDiv').fadeOut(300)
+      self.formDiv.classList.remove('active')
       $('.howToPlay').html('<div class="success"><i class="fa fa-check></i> Your record has been submittetd!</div>').fadeIn(500).fadeIn(500).delay(6000).fadeOut(1200)
     }
   })
@@ -342,25 +363,26 @@ Main.prototype.buildDataVisual = function (doc) {
 }
 
 Main.prototype.sendData = function () {
-  this.db.collection('gamers').where('phone', '==', form.phone.value).get().then((snapshot) => {
+  var self = this
+  this.db.collection('gamers').where('phone', '==', self.form.phone.value).get().then((snapshot) => {
     if (snapshot.docs.length > 0) {
       snapshot.docs.forEach(doc => {
         if (doc.data().time > form.time.value) {
           db.collection('gamers').doc(doc.id).set({
-            name: form.name.value,
-            phone: form.phone.value,
-            moves: +form.moves.value,
-            time: +form.time.value,
+            name: self.form.name.value,
+            phone: self.form.phone.value,
+            moves: +self.form.moves.value,
+            time: +self.form.time.value,
             date: firebase.firestore.FieldValue.serverTimestamp()
           })
         }
       })
     } else {
       this.db.collection('gamers').add({
-        name: form.name.value,
-        phone: form.phone.value,
-        moves: +form.moves.value,
-        time: +form.time.value,
+        name: self.form.name.value,
+        phone: self.form.phone.value,
+        moves: +self.form.moves.value,
+        time: +self.form.time.value,
         date: firebase.firestore.FieldValue.serverTimestamp()
       })
     }
