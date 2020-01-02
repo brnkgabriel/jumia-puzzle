@@ -1,0 +1,675 @@
+<script src="https://jumia.co/nl-templates-egypt/uploads/201812/sizzlejsss.js" type="text/javascript">
+</script>
+<script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-firestore.js"></script>
+<style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
+
+  :root {
+    --width: calc(100vw/4 - 10px);
+  }
+
+  .game {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    background-color: #ce1d00;
+    border-radius: 5px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: var(--width) var(--width) var(--width) var(--width);
+    grid-template-rows: var(--width) var(--width) var(--width) var(--width);
+    border: 1px solid #550000;
+  }
+
+  .grid button {
+    background-color: #cfcfcf;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    border: 1px solid #550000;
+    outline: none;
+    cursor: pointer;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .footer {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .footer button {
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    width: 80px;
+    background-color: #D4EE9F;
+    color: #003333;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .footer button:hover {
+    color: #D4EE9F;
+    background-color: #003333;
+  }
+
+  .footer span {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    color: #D4EE9F;
+    font-weight: bold;
+    margin: auto 0;
+  }
+
+  .message {
+    color: #AA3939;
+    height: 80px;
+    display: none;
+  }
+
+  div.form-group {
+    padding: 10px 5px;
+  }
+
+  input.form-control {
+    width: 100%;
+    border: 1px solid #ce1d00;
+    border-radius: 5px;
+    padding: 10px;
+    height: auto;
+    font-size: 14px;
+  }
+
+  input.form-control:focus {
+    border: 1px solid #ce1d00;
+  }
+
+  div.custom {
+    padding: 5px;
+    font-size: 14px;
+    background: #fff;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+    margin: 10px;
+  }
+
+  input[type="submit"] {
+    background: #ce1d00;
+    color: #fff;
+    box-shadow: 0 0 .2em #ddd;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    width: 50%;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .formDiv {
+    display: none;
+  }
+
+  .keyboard-line {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    margin: 2px 0px;
+  }
+
+  div.keyboard {
+    background: #C70039;
+  }
+
+  .keyboard-button {
+    width: calc(100vw/10);
+    height: calc(100vw/10);
+    color: #fff;
+    background: transparent;
+    border: none;
+    box-shadow: 0 0 0.1em rgba(0, 0, 0, 0.6);
+    transition: .1s;
+  }
+
+  button.space {
+    width: 50vw;
+    display: block;
+    margin: auto;
+    padding: 2px 34px;
+    background: transparent;
+    border: none;
+    box-shadow: 0 0 0.1em rgba(0, 0, 0, 0.6);
+  }
+
+  div.space-bar {
+    color: #fff;
+    padding: 2px;
+  }
+
+  .highlighted {
+    -webkit-animation: highlight .1s linear;
+    -moz-animation: highlight .1s linear;
+    -ms-animation: highlight .1s linear;
+    -o-animation: highlight .1s linear;
+    animation: highlight .1s linear;
+  }
+
+  @keyframes highlight {
+    0% {
+      background: rgba(0, 0, 0, .3);
+    }
+
+    50% {
+      background: rgba(0, 0, 0, .6);
+    }
+
+    100% {
+      background: rgba(0, 0, 0, .3);
+    }
+  }
+
+  #playButton {
+    -webkit-animation: colorized .1s linear;
+    -moz-animation: colorized .1s linear;
+    -ms-animation: colorized .1s linear;
+    -o-animation: colorized .1s linear;
+    animation: colorized .1s linear;
+  }
+
+  @keyframes colorized {
+    0% {
+      font-weight: normal;
+    }
+
+    50% {
+      font-weight: bold;
+    }
+
+    100% {
+      font-weight: normal;
+    }
+  }
+
+  .error {
+    color: red;
+    font-size: 10px;
+    display: none;
+  }
+
+  /*        New Text*/
+  table.scores-table {
+    border: none;
+    border-spacing: 0px;
+  }
+
+  table.scores-table thead tr th,
+  table.scores-table tbody tr td {
+    text-align: left;
+    padding: 3px 1px;
+  }
+
+  table.scores-table thead {
+    background: #999696;
+    color: #000;
+  }
+
+  /*
+    table.scores-table tbody tr td:first-child {
+        color: red;
+    }
+*/
+
+  table.scores-table tbody tr:nth-child(even) {
+    background: #F7F7F7;
+  }
+
+  table.scores-table tbody tr:first-child {
+    color: forestgreen;
+    font-weight: bold;
+  }
+
+  .success {
+    color: green;
+    font-weight: bold;
+    font-style: italic;
+  }
+</style>
+<div class="game">
+  <div class="grid">
+    <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>7</button><button>8</button><button>9</button><button>10</button><button>11</button><button>12</button><button>13</button><button>14</button><button>15</button><button></button>
+  </div>
+  <div class="footer"><button>Play</button><span id="move">Moves: 100</span><span id="time">Time: 0</span></div>
+</div>
+<h1 class="message">You win!</h1>
+<div class="custom howToPlay"><b>How To Play:</b> Tap on boxes adjacent to the empty white box to move them around.
+</div>
+<div class="custom formDiv">
+  <div class="form">
+    <form action="" id="game-over">
+      <h3 style="color:#ce1d00;">You are a genius!</h3><em>Your contact Details will not be shared publicly.</em>
+      <div class="form-group"><input type="text" name="name" id="name" class="form-control" placeholder="Full name" />
+      </div><input type="hidden" name="time" id="timerTicker" value="0" /><input type="hidden" name="moves" id="movesB"
+        value="0" />
+      <div class="form-group"><input type="text" name="phone" id="phone" class="form-control"
+          placeholder="Phone Number" /><span class="error">Fill details correctly!</span></div>
+      <div class="form-group"><input type="submit" name="" id="submit" class="" value="Send" /></div>
+      <div class="keyboard">
+        <div class="keyboard-line"><button class="keyboard-button">1</button><button
+            class="keyboard-button">2</button><button class="keyboard-button">3</button><button
+            class="keyboard-button">4</button><button class="keyboard-button">5</button><button
+            class="keyboard-button">6</button><button class="keyboard-button">7</button><button
+            class="keyboard-button">8</button><button class="keyboard-button">9</button><button
+            class="keyboard-button">0</button></div>
+        <div class="keyboard-line"><button class="keyboard-button">q</button><button
+            class="keyboard-button">w</button><button class="keyboard-button">e</button><button
+            class="keyboard-button">r</button><button class="keyboard-button">t</button><button
+            class="keyboard-button">y</button><button class="keyboard-button">u</button><button
+            class="keyboard-button">i</button><button class="keyboard-button">o</button><button
+            class="keyboard-button">p</button></div>
+        <div class="keyboard-line"><button class="keyboard-button">a</button><button
+            class="keyboard-button">s</button><button class="keyboard-button">d</button><button
+            class="keyboard-button">f</button><button class="keyboard-button">g</button><button
+            class="keyboard-button">h</button><button class="keyboard-button">j</button><button
+            class="keyboard-button">k</button><button class="keyboard-button">l</button></div>
+        <div class="keyboard-line"><button class="keyboard-button special uppercase"><i
+              class="fa fa-long-arrow-up"></i></button><button class="keyboard-button">z</button><button
+            class="keyboard-button">x</button><button class="keyboard-button">c</button><button
+            class="keyboard-button">v</button><button class="keyboard-button">b</button><button
+            class="keyboard-button">n</button><button class="keyboard-button">m</button><button
+            class="keyboard-button special backspace"><i class="fa fa-long-arrow-left"></i></button></div>
+        <div class="keyboard-line" style="margin:5px auto;"><button class="space">
+            <div class="space-bar">Space</div>
+          </button></div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="custom high-scores">
+  <h3 class="scores" style="margin:2px 1px;">High Scores.</h3>
+  <div class="score-card">
+    <table class="scores-table" style="width:100%;">
+      <thead>
+        <tr>
+
+          <th>Name</th>
+          <th>Time</th>
+          <th>Moves</th>
+        </tr>
+      </thead>
+      <tbody id="highScoresBody"></tbody>
+    </table>
+  </div>
+</div>
+<div class="feedback"></div>
+<script>
+  $(window).on("load", function () {
+    class Box {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+      }
+      getTopBox() {
+        if (this.y === 0) return null;
+        return new Box(this.x, this.y - 1);
+      }
+      getRightBox() {
+        if (this.x === 3) return null;
+        return new Box(this.x + 1, this.y);
+      }
+      getBottomBox() {
+        if (this.y === 3) return null;
+        return new Box(this.x, this.y + 1);
+      }
+      getLeftBox() {
+        if (this.x === 0) return null;
+        return new Box(this.x - 1, this.y);
+      }
+      getNextdoorBoxes() {
+        return [this.getTopBox(), this.getRightBox(), this.getBottomBox(), this.getLeftBox()].filter(box => box !== null);
+      }
+      getRandomNextdoorBox() {
+        const nextdoorBoxes = this.getNextdoorBoxes();
+        return nextdoorBoxes[Math.floor(Math.random() * nextdoorBoxes.length)];
+      }
+    }
+    const swapBoxes = (grid, box1, box2) => {
+      const temp = grid[box1.y][box1.x];
+      grid[box1.y][box1.x] = grid[box2.y][box2.x];
+      grid[box2.y][box2.x] = temp;
+    };
+    const isSolved = grid => {
+      return (grid[0][0] === 1 && grid[0][1] === 2 && grid[0][2] === 3 && grid[0][3] === 4 && grid[1][0] === 5 && grid[1][1] === 6 && grid[1][2] === 7 && grid[1][3] === 8 && grid[2][0] === 9 && grid[2][1] === 10 && grid[2][2] === 11 && grid[2][3] === 12 && grid[3][0] === 13 && grid[3][1] === 14 && grid[3][2] === 15 && grid[3][3] === 0);
+    };
+    const getRandomGrid = () => {
+      let grid = [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 10, 11, 12],
+        [13, 14, 15, 0]
+      ];
+      let blankBox = new Box(3, 3);
+      for (let i = 0; i < 1000; i++) {
+        const randomNextdoorBox = blankBox.getRandomNextdoorBox();
+        swapBoxes(grid, blankBox, randomNextdoorBox);
+        blankBox = randomNextdoorBox;
+      }
+      if (isSolved(grid)) return getRandomGrid();
+      return grid;
+    };
+    class State {
+      constructor(grid, move, time, status) {
+        this.grid = grid;
+        this.move = move;
+        this.time = time;
+        this.status = status;
+      }
+      static ready() {
+        return new State([
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ], 0, 0, "ready");
+      }
+      static start() {
+        return new State(getRandomGrid(), 0, 0, "playing");
+      }
+    }
+    class Game {
+      constructor(state) {
+        this.state = state;
+        this.tickId = null;
+        this.tick = this.tick.bind(this);
+        this.render();
+        this.handleClickBox = this.handleClickBox.bind(this);
+      }
+      static ready() {
+        return new Game(State.ready());
+      }
+      tick() {
+        var timeS = parseInt($('#timerTicker').val(), 0);
+        timeS += 1;
+        $('#timerTicker').val(timeS);
+        document.getElementById("time").textContent = `Time: ${timeS}`;
+      }
+      setState(newState) {
+        this.state = {
+          ...this.state,
+          ...newState
+        };
+        this.render();
+      }
+      handleClickBox(box) {
+        return function () {
+          const nextdoorBoxes = box.getNextdoorBoxes();
+          const blankBox = nextdoorBoxes.find(nextdoorBox => this.state.grid[nextdoorBox.y][nextdoorBox.x] === 0);
+          if (blankBox) {
+            const newGrid = [...this.state.grid];
+            swapBoxes(newGrid, box, blankBox);
+            if (isSolved(newGrid)) {
+              clearInterval(this.tickId);
+              this.setState({
+                status: "won",
+                grid: newGrid,
+                move: this.state.move + 1
+              });
+            } else {
+              this.setState({
+                grid: newGrid,
+                move: this.state.move + 1
+              });
+              handleMove();
+            }
+          }
+        }.bind(this);
+      }
+      render() {
+        const {
+          grid,
+          move,
+          time,
+          status
+        } = this.state;
+        const newGrid = document.createElement("div");
+        newGrid.className = "grid";
+        for (let i = 0; i < 4; i++) {
+          for (let j = 0; j < 4; j++) {
+            const button = document.createElement("button");
+            if (status === "playing") {
+              button.addEventListener("click", this.handleClickBox(new Box(j, i)));
+            }
+            button.textContent = grid[i][j] === 0 ? "" : grid[i][j].toString();
+            newGrid.appendChild(button);
+          }
+        }
+        document.querySelector(".grid").replaceWith(newGrid);
+        const newButton = document.createElement("button");
+        newButton.setAttribute('draggable', true);
+        newButton.setAttribute('ondragstart', 'this.click()');
+        if (status === "ready") newButton.textContent = "Play";
+        if (status === "ready") newButton.setAttribute('id', 'playButton');
+        if (status === "playing") newButton.textContent = "Reset";
+        if (status === "won") newButton.textContent = "Play";
+        if (status === "won") newButton.setAttribute('id', 'playButton');
+        newButton.addEventListener("click", () => {
+          clearInterval(this.tickId);
+          $('#timerTicker').val(0);
+          $('.formDiv').fadeOut(300);
+          this.tickId = setInterval(this.tick, 1000);
+          this.setState(State.start());
+        });
+        document.querySelector(".footer button").replaceWith(newButton);
+        document.getElementById("move").textContent = `Moves: ${move}`;
+        $('#movesB').val(move);
+        if (status === "won") {
+          var moves = $('#movesB').val();
+          var timeInSecs = $('#timerTicker').val();
+          $('.howToPlay').hide();
+          var nameT = $('#name').val();
+          var phoneT = $('#phone').val();
+          if (nameT != '' && phoneT != '') {
+            $('#game-over').submit();
+          } else {
+            $('.formDiv').fadeIn(400);
+          }
+
+          document.querySelector(".message").textContent = "You win!";
+        } else {
+          document.querySelector(".message").textContent = "";
+        }
+      }
+    }
+    const GAME = Game.ready();
+
+    function handleMove() {
+      var keys = $('.grid button');
+      $.each(keys, function (key, val) {
+        var innerText = $(this).text();
+        $(this).css('background-image', 'url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg)').attr('draggable', true).attr('ondragstart', 'this.click()');
+      });
+    }
+    setInterval(function () {
+      handleMove();
+    }, 100);
+
+    function clickMe(element) {
+      element.click();
+    }
+    $('.keyboard-button').not('.special').click(function (e) {
+      e.preventDefault();
+      var textK = $(this).text();
+      if ($(".formDiv").find('.focused').length > 0) {
+        var initialVal = $(".formDiv").find('.focused').val();
+        $(".formDiv").find('.focused').val(initialVal + textK);
+      } else {
+        $(".formDiv").find('input:first').focus();
+        var initialVal = $(".formDiv").find('.focused').val();
+        $(".formDiv").find('.focused').val(initialVal + textK);
+      }
+    });
+    $('input[type="text"]').focus(function () {
+      $('input[type="text"]').each(function () {
+        $(this).removeClass('focused');
+      });
+      $(this).addClass('focused');
+    });
+    $('.uppercase').click(function (e) {
+      e.preventDefault();
+      $('.keyboard-button').not('.special').each(function () {
+        var buttonText = $(this).text();
+        if (buttonText == buttonText.toLowerCase()) {
+          buttonText = buttonText.toUpperCase();
+        } else {
+          buttonText = buttonText.toLowerCase();
+        }
+        $(this).text(buttonText);
+      });
+    });
+    $('.backspace').click(function (e) {
+      e.preventDefault();
+      if ($(".formDiv").find('.focused').length > 0) {
+        var initialVal = $(".formDiv").find('.focused').val();
+        initialVal = initialVal.substring(0, initialVal.length - 1);
+        $(".formDiv").find('.focused').val(initialVal);
+      } else {
+        return;
+      }
+    });
+    $('.space-bar').click(function (e) {
+      e.preventDefault();
+      var textK = ' ';
+      if ($(".formDiv").find('.focused').length > 0) {
+        var initialVal = $(".formDiv").find('.focused').val();
+        $(".formDiv").find('.focused').val(initialVal + textK);
+      } else {
+        $(".formDiv").find('input:first').focus();
+        var initialVal = $(".formDiv").find('.focused').val();
+        $(".formDiv").find('.focused').val(initialVal + textK);
+      }
+    });
+    $('#submit').click(function (e) {
+      e.preventDefault();
+      var initBtnTxt = $(this).val();
+      var name = $.trim($('#name').val());
+      var phone = $.trim($('#phone').val());
+      var time = $('#timerTicker').val();
+      var moves = $('#movesB').val();
+      if (phone.length != 10 || name == '') {
+        $('.error').fadeIn(300);
+      } else {
+        sendData();
+
+        $('.formDiv').fadeOut(300);
+        $('.howToPlay').html('<div class="success"><i class="fa fa-check"></i> Your record has been submitted!</div>').fadeIn(500).fadeIn(500).delay(6000).fadeOut(1200);
+      }
+    });
+
+    function refreshList() {
+      $.ajax({
+        type: "POST",
+        url: 'https://jumia-puzzle.cecropsfreelance.com/read/read.php',
+        data: {
+          'name': 'name',
+          'phone': 'phone',
+          'time': 'time',
+          'moves': 'moves'
+        },
+        success: function (response) {
+          $('#highScoresBody').html(response);
+        },
+        error: function () { }
+      });
+    }
+  });
+  var firebaseConfig = {
+    apiKey: "AIzaSyCkGV2NWnLXED0zRzfC_3X3-P23zaFm7h8",
+    authDomain: "jumee-puzzle.firebaseapp.com",
+    databaseURL: "https://jumee-puzzle.firebaseio.com",
+    projectId: "jumee-puzzle",
+    storageBucket: "jumee-puzzle.appspot.com",
+    messagingSenderId: "159018014952",
+    appId: "1:159018014952:web:ee88027b4e7649dfbe115d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const tbody = document.querySelector('#highScoresBody');
+  const form = document.querySelector('#game-over');
+
+  function buildDataVisual(doc) {
+    let tr = document.createElement("tr");
+    let name = document.createElement("td");
+    let moves = document.createElement("td");
+    let time = document.createElement("td");
+    tr.setAttribute("data-id", doc.id);
+    name.textContent = doc.data().name;
+    time.textContent = doc.data().time;
+    moves.textContent = doc.data().moves;
+    tr.appendChild(name);
+    tr.appendChild(time);
+    tr.appendChild(moves);
+    tbody.appendChild(tr);
+    db.collection("gamers").doc(doc.id).onSnapshot({}, function (doc) {
+      let tr = tbody.querySelector('[data-id="' + doc.id + '"]');
+      let name = document.createElement("td");
+      let moves = document.createElement("td");
+      let time = document.createElement("td");
+      name.textContent = doc.data().name;
+      time.textContent = doc.data().time;
+      moves.textContent = doc.data().moves;
+      tr.innerHTML = "";
+      tr.appendChild(name);
+      tr.appendChild(time);
+      tr.appendChild(moves);
+    });
+  }
+
+  function sendData() {
+    db.collection('gamers').where("phone", "==", form.phone.value).get().then((snapshot) => {
+      if (snapshot.docs.length > 0) {
+        snapshot.docs.forEach((doc) => {
+          if (doc.data().time > form.time.value) {
+            db.collection("gamers").doc(doc.id).set({
+              name: form.name.value,
+              phone: form.phone.value,
+              moves: +form.moves.value,
+              time: +form.time.value,
+              date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+          } else {
+
+          }
+        });
+      } else {
+        db.collection("gamers").add({
+          name: form.name.value,
+          phone: form.phone.value,
+          moves: +form.moves.value,
+          time: +form.time.value,
+          date: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+
+    });
+
+  }
+  db.collection('gamers').orderBy('time', 'asc').limit(30).onSnapshot(snapshot => {
+    let changes = snapshot.docChanges();
+    changes.forEach(change => {
+      if (change.type == 'added') {
+        buildDataVisual(change.doc);
+      } else if (change.type == 'removed') {
+        let tr = tbody.querySelector('[data-id="' + change.doc.id + '"]');
+        tbody.removeChild(tr);
+      } else if (change.type == 'modified') { }
+    });
+  });
+</script>
