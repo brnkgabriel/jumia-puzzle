@@ -12,6 +12,10 @@
   --width: calc(100vw/4 - 10px)
 }
 
+.pos-rel {
+  position: relative
+}
+
 #game-over h3 {
   color: #ce1d00
 }
@@ -148,7 +152,7 @@ input[type="submit"] {
 }
 
 div.keyboard {
-  background: #c70039;
+  background: hsl(343, 100%, 39%);
 }
 
 .keyboard-button {
@@ -164,7 +168,6 @@ div.keyboard {
 button.space {
   width: 50vw;
   display: block;
-  margin: auto;
   padding: 10px 34px;
   background: transparent;
   border: none;
@@ -219,6 +222,10 @@ div.space-bar {
   display: none
 }
 
+.error.active {
+  display: block;
+}
+
 table.scores-table {
   border: none;
   border-spacing: 0px;
@@ -226,8 +233,9 @@ table.scores-table {
 
 table.scores-table thead tr th,
 table.scores-table tbody tr td {
-  text-align: left;
   padding: 3px 1px;
+  padding-left: 20px;
+  text-align: left;
 }
 
 table.scores-table thead {
@@ -249,3 +257,64 @@ table.scores-table tbody tr:first-child {
   font-weight: bold;
   font-style: italic
 }
+.backspace::before,
+.backspace::after,
+.uppercase::before,
+.uppercase::after {
+  content: '';
+  position: absolute
+}
+
+.backspace::before,
+.uppercase::before {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%,-50%) rotate(45deg);
+}
+
+.backspace::after,
+.uppercase::after {
+  width: 2px;
+  height: 10px;
+  background-color: white;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.backspace::before {
+  transform: translate(-50%,-50%) rotate(-45deg);
+  top: 50%;
+}
+
+.backspace::after {
+  transform: translate(-50%,-50%) rotate(90deg);
+  left: 55%;
+  top: 50%;
+}
+/* 
+.howToPlay {
+  animation: fadeOutFromBlock 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.howToPlay.active {
+  display: block;
+  animation: fadeInFromNone 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@keyframes fadeInFromNone {
+  0% { display: none; opacity: 0; }
+  1% { display: block; opacity: 0; }
+  100% { display: block; opacity: 1; }
+}
+
+@keyframes fadeOutFromBlock {
+  0% { display: block; opacity: 1; }
+  1% { display: block; opacity: 1; }
+  100% { display: none; opacity: 0; }
+} */
