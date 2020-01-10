@@ -363,19 +363,16 @@ var Variables = function () {
   this.now = new Date()
   this.GMT = 'GMT+0100'
   this.LIVE_LINK = '/mobile-apps/'
-  this.BOB_IMG_LINK = 'https://ng.jumia.is/cms/8-18/christmas/2019/flash-sales'
+  this.deepLinks = {
+    liveGiveaways: 'https://aal4.adj.st/ng/ss/live-giveaways-app?adjust_t=itk4eyn_9sytz8o&adjust_campaign=NG&adjust_adgroup=CS-20&adjust_creative=GA_PAGE&adjust_deeplink=jumia%3A%2F%2Fng%2Fss%2Flive-giveaways-app&adjust_redirect=https%3A%2F%2Fwww.jumia.com.ng%2Flive-giveaways-app',
+    jumiaGames: 'https://aal4.adj.st/ng/ss/jumia-games?adjust_t=itk4eyn_9sytz8o&adjust_campaign=NG&adjust_adgroup=CS-20&adjust_creative=GA_PAGE&adjust_deeplink=jumia%3A%2F%2Fng%2Fss%2Fjumia-games&adjust_redirect=https%3A%2F%2Fwww.jumia.com.ng%2Fjumia-games'
+  }
+  this.BOB_IMG_LINK = 'https://ng.jumia.is/cms/8-18/clearance-sale/calendar'
   this.extraHours = 0
-  this.extraMinutes = 20
+  this.extraMinutes = 59
   this.rawSKUs = [
-    "King Oil|5ltrs|January 05 2020 17:00:00 GMT+0100|₦3,500|₦2,150|100|devon-king-oil.jpg",
-    "Apple iPhone 11|4GB/64GB|January 13 2020 12:00:00 GMT+0100|₦350,000|₦249,000|10|iphone-11.jpg",
-    "Big Bull Rice|5kg + Cubes|January 14 2020 12:00:00 GMT+0100|₦3,500|₦1,990|100|bigbull-rice-cubes.jpg",
-    "Nexus Blender|1.5ltrs|January 15 2020 12:00:00 GMT+0100|₦7,500|₦4,500|100|nexus-blender-1-5ltrs.jpg",
-    "Tomato King Rice|50kg|January 16 2020 12:00:00 GMT+0100|₦25,000|₦14,990|100|tomato-king-rice-50kg.jpg",
-    "Midea Microwave|20ltrs|January 17 2020 12:00:00 GMT+0100|₦22,000|₦13,500|100|midea-microwave-20ltrs.jpg",
-    "Lloyd Home Theatre|Bluetooth|January 18 2020 12:00:00 GMT+0100|₦30,000|₦12,500|100|lloyd-home-theatre.jpg",
-    "Canvas Shoes|Men|January 19 2020 19:00:00 GMT+0100|₦7,500|₦2,500|100|mens-canvas-last.jpg",
-    "Canvas Shoes|Men|January 14 2020 19:00:00 GMT+0100|₦7,500|₦2,500|100|mens-canvas-last.jpg",
+    "Live Giveaway Bundle|(2 Indomie pack, 1 Chunky Sneakers, 1 Knee Protector, 1 Eyeshadow box, Black Bell Hand Top - Size 8, Peach Pallazo With Rope - Size 8, 3 Cupboard protector, Automatic Fuel fluid water syphon pump)|January 10 2020 03:00:00 GMT+0100|Win the Bundle|Guess the Price|100|live-giveaway-sku.jpg|liveGiveaways",
+    "Puzzle|(Redmi 7-2GB/16GB, Binatone Rechargeagle Juice Blender)|January 14 2020 12:00:00 GMT+0100|₦350,000|Put It Together|100|puzzle-sku.jpg|jumiaGames",
   ]
   this.skus = []
   this.skusEl = document.querySelector('.-skus.-fs')
@@ -387,13 +384,15 @@ var Variables = function () {
     'sunday', 'monday', 'tuesday',
     'wednesday', 'thursday', 'friday',
     'saturday'
-  ],
-  this.campaignWeeks = ['january-1-5', 'january-13-19']
+  ]
+  // adjust campaignWeeks = ensure dates in rawSKUs are within the range below
+  this.campaignWeeks = ['january-13-19']
 }
 
 var Sales = function (variables) {
   this.now = variables.now
   this.GMT = variables.GMT
+  this.deepLinks = variables.deepLinks
   this.LIVE_LINK = variables.LIVE_LINK
   this.BOB_IMG_LINK = variables.BOB_IMG_LINK
   this.extraHours = variables.extraHours
@@ -425,7 +424,7 @@ Sales.prototype.expand = function (skus) {
     return {
       name: split[0], desc: split[1], time: split[2],
       oldPrice: split[3], newPrice: split[4], units: split[5],
-      img: split[6]
+      img: split[6], page: split[7]
     }
   })
 }
@@ -455,7 +454,7 @@ Sales.prototype.skuDay = function (time) {
   var date = new Date(time).getDate()
   var dateTxt = this.position(date)
   if (window.innerWidth < 481) {
-    return `${this.daysOfWeek[day].substr(0, 3)} <br/> ${this.months[month].substr(0,3)} ${dateTxt}`
+    return `${this.daysOfWeek[day].substr(0, 3)} <br/> ${this.months[month].substr(0, 3)} ${dateTxt}`
   }
   return `${this.daysOfWeek[day]} ${this.months[month]} ${dateTxt}`
 }
@@ -498,8 +497,8 @@ Sales.prototype.md = function (time) {
   return { month, date }
 }
 
-Sales.prototype.timeInWeekCondition = function(refsW, md) {
-  return md['month'] == refsW['month'] && this.btw(md['date'] , refsW['min'], refsW['max'])
+Sales.prototype.timeInWeekCondition = function (refsW, md) {
+  return md['month'] == refsW['month'] && this.btw(md['date'], refsW['min'], refsW['max'])
 }
 
 Sales.prototype.btw = function (x, min, max) { return x >= min && x <= max }
@@ -596,7 +595,7 @@ Sales.prototype.buildSKUs = function (marked) {
       var timeTxt = self.timeTxt(sku['time'])
       var liveLink = self.LIVE_LINK
       if (window.innerWidth < 481) {
-        liveLink = 'https://aal4.adj.st/ng/camp/xmas-flash-sales?adjust_t=itk4eyn_9sytz8o&adjust_campaign=NG&adjust_adgroup=XMAS-19&adjust_creative=FS_PAGE&adjust_deeplink=jumia%3A%2F%2Fng%2Fcamp%2Fxmas-flash-sales&adjust_redirect=https%3A%2F%2Fwww.jumia.com.ng%2Fxmas-flash-sales'
+        liveLink = this.deepLinks[sku['page']]
       }
       var skuProps = {
         skuEl: ['div', { class: skuClass }, '', ''],
@@ -622,7 +621,7 @@ Sales.prototype.buildSKUs = function (marked) {
       var nextSKU = document.querySelector('.-next.--sku')
       coming.addEventListener('click', () => {
         self.masksFS.classList.add('md-active')
-        text = sku['name'] + ' ' + sku['desc'] + ' will be available<br/>' + self.skuDay(rowTime).toUpperCase() +' by ' + timeTxt
+        text = sku['name'] + ' ' + sku['desc'] + ' will be available<br/>' + self.skuDay(rowTime).toUpperCase() + ' by ' + timeTxt
         nextSKU.innerHTML = text
       })
       var time = self.create(skuProps['time'])
@@ -712,9 +711,20 @@ Sales.prototype.remainingTime = function (endTime) {
   return { days, hours, minutes, seconds }
 }
 
+Sales.prototype.minifyDate = function (title) {
+  var span = title.querySelector('span')
+  var datePieces = span.textContent.split(' ')
+  var minified = datePieces.map((piece, idx) => {
+    if (idx == 0) return piece.substr(0, 3)
+    return piece.substr(0, 4)
+  })
+  var final = minified[0] + '<br/>' + minified[1] + ' ' + minified[2] + ' ' + minified[3]
+  span.innerHTML = final
+}
+
 Sales.prototype.setClock = function (skus) {
   var nextTime = this.nextTime(skus)
-  
+
   var milliTime = +new Date(nextTime['time'])
   var campaignWeek = this.campaignWeek(nextTime['ref'])
   var clockRow = document.querySelector('.-sku_row-' + campaignWeek)
@@ -722,6 +732,8 @@ Sales.prototype.setClock = function (skus) {
   var notificationTxt = (nextTime['type'] == 'end') ? 'sale ends in:' : 'sale starts in:'
   var notification = this.create(['div', { class: 'pos-abs -notification' }, '', notificationTxt])
   this.appendMany2One([notification, this.clock()], clockParent)
+  if (window.innerWidth < 481)
+    this.minifyDate(clockParent)
 
   var rt = this.remainingTime(milliTime)
   var startTime = Object.keys(rt)
@@ -892,6 +904,7 @@ Main.prototype.init = function () {
   this.sales = new Sales(variables)
   var sortedSKUS = this.sales.qSort(this.sales.rawSKUs)
   var expandedSKUS = this.sales.expand(sortedSKUS)
+  console.log('expandedSKUS', expandedSKUS)
   var grpSKUs = this.sales.grpSKUs(expandedSKUS)
   this.sales.buildSKUs(grpSKUs)
   this.sales.markAsSold(grpSKUs)
