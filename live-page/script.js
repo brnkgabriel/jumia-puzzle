@@ -311,7 +311,6 @@ Main.prototype = {
         var list = [], listObj = {}
         snapshot.docChanges().forEach(change => listObj = change.doc.data())
         Object.keys(listObj).forEach(key => list.push(listObj[key]))
-        console.log('list', list)
         self.buildDataVisual(list)
       }, err => console.error(err.message))
   },

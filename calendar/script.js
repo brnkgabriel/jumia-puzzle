@@ -371,8 +371,11 @@ var Variables = function () {
   this.extraHours = 0
   this.extraMinutes = 59
   this.rawSKUs = [
-    "Live Giveaway Bundle|(2 Indomie pack, 1 Chunky Sneakers, 1 Knee Protector, 1 Eyeshadow box, Black Bell Hand Top - Size 8, Peach Pallazo With Rope - Size 8, 3 Cupboard protector, Automatic Fuel fluid water syphon pump)|January 10 2020 03:00:00 GMT+0100|Win the Bundle|Guess the Price|100|live-giveaway-sku.jpg|liveGiveaways",
+    "Live Giveaway Bundle|(2 Indomie pack, 1 Chunky Sneakers, 1 Knee Protector, 1 Eyeshadow box, Black Bell Hand Top - Size 8, Peach Pallazo With Rope - Size 8, 3 Cupboard protector, Automatic Fuel fluid water syphon pump)|January 13 2020 12:00:00 GMT+0100|Win the Bundle|Guess the Price|100|live-giveaway-sku.jpg|liveGiveaways",
     "Puzzle|(Redmi 7-2GB/16GB, Binatone Rechargeagle Juice Blender)|January 14 2020 12:00:00 GMT+0100|₦350,000|Put It Together|100|puzzle-sku.jpg|jumiaGames",
+    "Live Giveaway Bundle|(Cubot R15 2GB/16GB, 2 Indomie Cartons, Formal Men Shirt - Pink, 1 Stagenius Eye Shadow, Mobile Phone Telescope Camera magnifier, Pair of Loafers {Men Black Size 43}, Cupboard protector, Zipper Earpiece)|January 15 2020 12:00:00 GMT+0100|Win the Bundle|Guess the Price|100|live-giveaway-sku-wed.jpg|liveGiveaways",
+    "Puzzle|(Crown Star Electric Cooker - Dual Burner)|January 16 2020 12:00:00 GMT+0100|₦350,000|Put It Together|100|puzzle-sku-thu.jpg|jumiaGames",
+    "Live Giveaway Bundle|(2 Indomie Cartons, Spy Pen, Black Jeans with Zipper, 1 Stagenius Eyeshadow, Formal Men Shirt - Black, Oxford Brogues - Brown, Cupboard Protector, Electronic Mosquito Killer)|January 17 2020 12:00:00 GMT+0100|Win the Bundle|Guess the Price|100|live-giveaway-sku-fri.jpg|liveGiveaways",
   ]
   this.skus = []
   this.skusEl = document.querySelector('.-skus.-fs')
@@ -621,7 +624,7 @@ Sales.prototype.buildSKUs = function (marked) {
       var nextSKU = document.querySelector('.-next.--sku')
       coming.addEventListener('click', () => {
         self.masksFS.classList.add('md-active')
-        text = sku['name'] + ' ' + sku['desc'] + ' will be available<br/>' + self.skuDay(rowTime).toUpperCase() + ' by ' + timeTxt
+        text = sku['name'] + ' ' + sku['desc'] + ' will be available on <br/>' + self.skuDay(sku['time']).toUpperCase() + ': ' + self.twelveHrForm(new Date(sku['time']).getHours()).toUpperCase() 
         nextSKU.innerHTML = text
       })
       var time = self.create(skuProps['time'])

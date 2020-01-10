@@ -799,7 +799,14 @@
 
   .-header {
     background-color: var(--campaignDarkColor);
-    padding: 10px 5px;
+    padding-bottom: 10px;
+  }
+
+  .-header>.-logo {
+
+  }
+  .-header>.-logo>img {
+    width: 100%;
   }
 
   .-header>.-campaign {

@@ -252,6 +252,7 @@
     position: relative;
     background-color: white;
     padding-bottom: 20px;
+    position: relative
   }
 
   .-skus>.-sku_row>.-day_skus>.-sku>.-time {
@@ -794,8 +795,11 @@
 
   .-header {
     background-color: var(--campaignDarkColor);
-    padding: 10px 5px;
     height: 150px;
+  }
+
+  .-header > img {
+    width: 100%;
   }
 
   .-header>.-campaign {
@@ -859,6 +863,9 @@
     transform: translate(-50%,-50%);
     cursor: pointer;
     display: block;
+  }
+  .-coming:hover {
+    background-color: rgba(0, 0, 0, 0.2)
   }
 
   .-sku.-live .-coming {
