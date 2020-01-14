@@ -16,16 +16,38 @@
   position: relative
 }
 
+.pos-abs {
+  position: absolute
+}
+
+.-inline_block {
+  display: inline-block;
+  vertical-align: middle
+}
+
 #game-over h3 {
-  color: #ce1d00
+  color: #c50707
 }
 
 .keyboard-line.-last {
-  margin: 5px auto;
+  
 }
 
-.high-scores > .high-scores {
-  margin: 2px 1px
+.high-scores > .-btn {
+  text-align: center;
+  padding: 20px 0;
+  background-color: #c50707;
+  color: white;
+  text-transform: uppercase;
+  border-radius: 5px;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.high-scores > .-btn.-grayout {
+  background-color: lightgray;
+  color: gray;
+  pointer-events: none;
 }
 
 .scores-table {
@@ -35,7 +57,7 @@
 .game {
   box-shadow: 0 1px 4px rgba(0,0,0,0.5);
   padding: 15px;
-  background-color: #ce1d00;
+  background-color: #ffc7c4;
   border-radius: 5px;
 }
 
@@ -47,16 +69,28 @@
 }
 
 .grid button {
-  background-color: #cfcfcf;
+  background-color: lightgray;
   color: black;
   font-size: 24px;
   font-weight: bold;
-  border: 1px solid #550000;
+  border: 1px solid #000;
   outline: none;
   cursor: pointer;
   background-position: center;
   background-size: contain;
+  position: relative
 }
+
+.grid button span {
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  color: yellow;
+  text-shadow: 1px 1px 1px black;
+}
+
 
 .footer {
   margin-top: 15px;
@@ -72,22 +106,22 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.5);
   padding: 5px;
   width: 80px;
-  background-color: #d4ee9f;
-  color: #033;
+  background-color: #c50707;
+  color: white;
   outline: none;
   cursor: pointer
 }
 
 .footer button:hover {
-  color: #d4ee9f;
-  background-color: #033;
+  color: #c50707;
+  background-color: #fff;
 }
 
 .footer span {
   flex: 1;
   text-align: center;
   font-size: 20px;
-  color: #d4ee9f;
+  color: #c50707;
   font-weight: bold;
   margin: auto 0
 }
@@ -104,7 +138,7 @@ div.form-group {
 
 input.form-control {
   width: 100%;
-  border: 1px solid #ce1d00;
+  border: 1px solid #c50707;
   border-radius: 5px;
   padding: 10px;
   height: auto;
@@ -112,7 +146,7 @@ input.form-control {
 }
 
 input.form-control:focus {
-  border: 1px solid #ce1d00
+  border: 1px solid #c50707
 }
 
 div.custom {
@@ -124,7 +158,7 @@ div.custom {
 }
 
 input[type="submit"] {
-  background: #ce1d00;
+  background: #c50707;
   color: white;
   box-shadow: 0 0 .2em #ddd;
   padding: 10px 20px;
@@ -152,7 +186,7 @@ input[type="submit"] {
 }
 
 div.keyboard {
-  background: hsl(343, 100%, 39%);
+  background: #c50707;
 }
 
 .keyboard-button {
@@ -177,7 +211,6 @@ button.space {
 
 div.space-bar {
   color: white;
-  padding: 2px;
 }
 
 .highlighted {
@@ -200,6 +233,12 @@ div.space-bar {
 
 #playButton {
   animation: colorized .1s linear;
+}
+
+#playButton.-play {
+  animation: blinking;
+  animation-duration: .888s;
+  animation-iteration-count: infinite;
 }
 
 @keyframes colorized {
@@ -226,28 +265,76 @@ div.space-bar {
   display: block;
 }
 
-table.scores-table {
+.scores-table {
   border: none;
   border-spacing: 0px;
 }
 
-table.scores-table thead tr th,
-table.scores-table tbody tr td {
-  padding: 3px 1px;
-  padding-left: 20px;
+.scores-table > .-arrow_up,
+.scores-table > .-arrow_down {
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.scores-table > .-arrow_up.-off,
+.scores-table > .-arrow_down.-off {
+  display: none;
+}
+
+.scores-table > .-arrow_up {
+  top: 16%;
+}
+
+.scores-table > .-arrow_down {
+  bottom: 2%;
+  transform: translateX(-50%) rotate(-135deg);
+}
+
+.scores-table .-table_head .-tr,
+.scores-table .-table_body .-tr {
+  padding: 5px 10px;
+}
+.scores-table .-table_head .-tr .-td,
+.scores-table .-table_body .-tr .-td {
   text-align: left;
 }
-
-table.scores-table thead {
-  background: #999696;
-  color: black;
+.scores-table .-table_body .-tr:nth-child(1) {
+  color: #c50707;
+  font-weight: 600
 }
 
-table.scores-table tbody tr:nth-child(even) {
+.scores-table .-tr .-td.-number {
+  width: 10%;
+}
+
+.scores-table .-tr .-td.-name {
+  width: 50%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.scores-table .-tr .-td.-time,
+.scores-table .-tr .-td.-moves {
+  width: 20%;
+  text-align: right
+}
+
+.scores-table .-table_head {
+  background: #ffc7c4;
+  color: #c50707;
+  font-weight: 600;
+}
+
+.scores-table .-table_body tr:nth-child(even) {
   background: #f7f7f7;
 }
 
-table.scores-table tbody tr:first-child {
+.scores-table .-table_body tr:first-child {
   color: forestgreen;
   font-weight: bold;
 }
@@ -297,24 +384,80 @@ table.scores-table tbody tr:first-child {
   left: 55%;
   top: 50%;
 }
-/* 
-.howToPlay {
-  animation: fadeOutFromBlock 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+.-social_medias {
+  text-align: center;
+  margin: 10px 0;
+}
+.-social_medias > .-title {
+
+}
+.-social_medias > .-social_media {
+  max-width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 8px;
+  margin: 0 5px;
 }
 
-.howToPlay.active {
-  display: block;
-  animation: fadeInFromNone 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+.-social_medias > .-social_media > img {
+  width: 100%;
+}
+.-social_medias > .-social_media.-facebook {
+  background-color: #3b579d
+}
+.-social_medias > .-social_media.-twitter {
+  background-color: #23a3ff;
 }
 
-@keyframes fadeInFromNone {
-  0% { display: none; opacity: 0; }
-  1% { display: block; opacity: 0; }
-  100% { display: block; opacity: 1; }
+#highScoresBody {
+  height: 200px;
+  overflow-y: scroll;
 }
 
-@keyframes fadeOutFromBlock {
-  0% { display: block; opacity: 1; }
-  1% { display: block; opacity: 1; }
-  100% { display: none; opacity: 0; }
-} */
+@keyframes blinking {
+  0% {
+    background-color: #c50707;
+    color: white;
+  }
+
+  24% {
+    background-color: #c50707;
+    color: white;
+  }
+
+  25% {
+    background-color: white;
+    color: #c50707;
+  }
+
+  49% {
+    background-color: white;
+    color: #c50707;
+  }
+
+  50% {
+    background-color: #c50707;
+    color: white;
+  }
+
+  74% {
+    background-color: #c50707;
+    color: white;
+  }
+
+  75% {
+    background-color: white;
+    color: #c50707;
+  }
+
+  99% {
+    background-color: white;
+    color: #c50707;
+  }
+
+  100% {
+    background-color: #c50707;
+    color: white;
+  }
+}

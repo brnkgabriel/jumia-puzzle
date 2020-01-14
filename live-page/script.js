@@ -35,7 +35,7 @@ var State = function (grid, move, time, status) {
   this.time = time
   this.status = status
 }
-
+// [MEDIA_BASE_URL]/cms/8-18/clearance-sale/puzzle/jan-14/1.jpg
 State.handleMove = function () {
   var keys = document.querySelectorAll('.grid button')
   keys.forEach(key => {
@@ -43,7 +43,7 @@ State.handleMove = function () {
     key.setAttribute('draggable', true)
     key.setAttribute('ondragstart', 'this.click()')
     if (innerText) {
-      key.setAttribute('style', 'background-image:url(https://ke.jumia.is/cms/2019/J-PUZZLE/20th-dec/' + innerText + '.jpg')
+      key.setAttribute('style', 'background-image:url(https://ng.jumia.is/cms/8-18/clearance-sale/puzzle/jan-14/' + innerText + '.jpg')
     }
   })
 }
@@ -137,11 +137,18 @@ Game.prototype = {
     newButton.setAttribute('draggable', true)
     newButton.setAttribute('ondragstart', 'this.click()')
   
-    if (status === 'ready') newButton.textContent = 'Play'
-    if (status === 'ready') newButton.setAttribute('id', 'playButton')
-    if (status === 'playing') newButton.textContent = 'Reset'
-    if (status === 'won') newButton.textContent = 'Play'
-    if (status === 'won') newButton.setAttribute('id', 'playButton')
+    if (status === 'ready' || status === 'won') {
+      newButton.textContent = 'Play'
+      newButton.setAttribute('id', 'playButton')
+      newButton.classList.add('-play')
+    } else {
+      newButton.textContent = 'Reset'
+    }
+    // if (status === 'ready') newButton.textContent = 'Play'
+    // if (status === 'ready') newButton.setAttribute('id', 'playButton')
+    // if (status === 'playing') newButton.textContent = 'Reset'
+    // if (status === 'won') newButton.textContent = 'Play'
+    // if (status === 'won') newButton.setAttribute('id', 'playButton')
   
     newButton.addEventListener('click', () => {
       clearInterval(this.tickId)
@@ -160,10 +167,13 @@ Game.prototype = {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
         const button = document.createElement('button')
+        const buttonSpan = document.createElement('span')
         if (status === 'playing') {
           button.addEventListener('click', this.handleClickBox(new Box(j, i)))
         }
-        button.textContent = grid[i][j] === 0 ? '' : grid[i][j].toString()
+        buttonSpan.textContent = grid[i][j] === 0 ? '' : grid[i][j].toString()
+        button.appendChild(buttonSpan)
+        // button.textContent = grid[i][j] === 0 ? '' : grid[i][j].toString()
         newGrid.appendChild(button)
       }
     }
@@ -190,6 +200,10 @@ Game.prototype = {
 
 var Main = function () {
   this.tbody = document.querySelector('#highScoresBody')
+  this.arrowUp = document.querySelector('.-arrow_up')
+  this.arrowDown = document.querySelector('.-arrow_down')
+  this.scrollUp = document.querySelector('.-scroll_up')
+  this.scrollDown = document.querySelector('.-scroll_down')
   this.form = document.querySelector('#game-over')
   this.formDiv = document.querySelector('.formDiv')
   this.name = document.getElementById('name')
@@ -224,6 +238,7 @@ Main.prototype = {
   listeners: function () {
     this.keyListeners()
     this.dbListener()
+    this.scrollListener()
   },
   keyListeners: function () {
     var self = this
@@ -300,10 +315,6 @@ Main.prototype = {
       }
     })
   },
-  validateEmail: function (email) {
-    var re = /\S+@\S+\.\S+/
-    return re.test(email)
-  },
   dbListener: function () {
     var self = this
     this.db.collection('puzzle')
@@ -313,6 +324,57 @@ Main.prototype = {
         Object.keys(listObj).forEach(key => list.push(listObj[key]))
         self.buildDataVisual(list)
       }, err => console.error(err.message))
+  },
+  scrollListener: function () {
+    var self = this
+    self.arrowUp.classList.add('-off')
+    this.tbody.addEventListener('scroll', function () {
+      var isEndOfTable = self.tbody.scrollHeight - self.tbody.offsetHeight == self.tbody.scrollTop
+      var isTopOfTable = self.tbody.scrollTop == 0
+      var aUfn = self.arrowUp.classList
+      var aDfn = self.arrowDown.classList
+
+      isTopOfTable ? aUfn.add('-off') : aUfn.remove('-off');
+      isEndOfTable ? aDfn.add('-off') : aDfn.remove('-off');
+      
+      // isTopOfTable ? self.scrollUp.add('-grayout') : self.scrollUp.remove('-grayout');
+      // isEndOfTable ? self.scrollDown.add('-grayout') : self.scrollDown.remove('-grayout');
+    })
+    
+    self.scrollUp.addEventListener('click', function (e) {
+      var start = self.tbody.scrollTop - 10, end = self.tbody.scrollTop - 80
+      self.tween(start, end, 500, self.easeOutQuart, self.tbody);
+    });
+    self.scrollDown.addEventListener('click', function (e) {
+      var start = self.tbody.scrollTop + 10, end = self.tbody.scrollTop + 80
+      self.tween(start, end, 500, self.easeOutQuart, self.tbody);
+    })
+  },
+  easeOutQuart: function (x, t, b, c, d) {
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+  },
+  tween: function (start, end, duration, easing, w) {
+    var delta = end - start;
+    var startTime;
+    if (window.performance && window.performance.now) {
+      startTime = performance.now();
+    } else if (Date.now) {
+      startTime = Date.now();
+    } else {
+      startTime = new Date().getTime();
+    }
+    var tweenLoop = function (time) {
+      var t = (!time ? 0 : time - startTime);
+      var factor = easing(null, t, 0, 1, duration);
+      w.scrollTop = start + delta * factor;
+      if (t < duration && w.scrollTop != end)
+        requestAnimationFrame(tweenLoop);
+    }
+    tweenLoop();
+  },
+  validateEmail: function (email) {
+    var re = /\S+@\S+\.\S+/
+    return re.test(email)
   },
   appendMany2One: function (many, one) { many.forEach(item => one.appendChild(item)) },
   setAttributes: function (el, obj) { Object.keys(obj).forEach(key => el.setAttribute(key, obj[key])) },
@@ -340,32 +402,47 @@ Main.prototype = {
     this.tbody.innerHTML = ""
     list.forEach(el => self.tbody.appendChild(el));
   },
-  time: function (el) { return el.querySelector('.-time').textContent; },
+  value: function (el, param) { return el.querySelector('.-' + param).textContent; },
   sortTable: function (list) {
-    var self = this;
-    return [...list].sort((a, b) => {
-      var aTime = self.time(a);
-      var bTime = self.time(b);
-      return parseInt(aTime) > parseInt(bTime) ? 1 : -1;
+    var self = this, finalList = []
+    var times = list.map(qualifier => parseInt(self.value(qualifier, 'time')))
+    var timesSet = new Set(times)
+    var sortedTimes = [...timesSet].sort((a, b) => a - b)
+
+    sortedTimes.map(time => {
+      var sortedDuplicates = list.filter(item => parseInt(self.value(item, 'time')) == time)
+      .sort((a, b) => parseInt(self.value(a, 'moves')) - parseInt(self.value(b, 'moves')))
+      sortedDuplicates.forEach(el => finalList.push(el))
     })
+    finalList.map((node, idx) => {
+      node.querySelector('.-number').textContent = idx + 1
+      return node
+    })
+
+    return finalList
   },
   createOrUpdateQualifierEl: function (list) {
     var self = this
-    list.forEach(qualifier => {
+    list.forEach((qualifier, idx) => {
+      qualifier.number = idx + 1
       var inQualifierEls = self.isInQualifierEls(qualifier);
       (inQualifierEls) ? self.updateEl(qualifier, inQualifierEls) : self.createEl(qualifier)
     })
   },
-  createEl: function (list) {
+  createEl: function (qualifier) {
     var props = {
-      tr: ['tr', { 'id': list.email }, '', ''], name: ['td', { class: '-name' }, '', list.name],
-      time: ['td', { class: '-time' }, '', list.time], moves: ['td', { class: '-moves' }, '', list.moves]
+      tr: ['div', { 'id': qualifier.email, class: '-tr' }, '', ''],
+      number: ['div', { class: '-number -td -inline_block' }, '', qualifier.number],
+      name: ['div', { class: '-name -td -inline_block' }, '', qualifier.name],
+      time: ['div', { class: '-time -td -inline_block' }, '', qualifier.time],
+      moves: ['div', { class: '-moves -td -inline_block' }, '', qualifier.moves]
     }
     var tr = this.create(props['tr'])
+    var number = this.create(props['number'])
     var name = this.create(props['name'])
     var time = this.create(props['time'])
     var moves = this.create(props['moves'])
-    this.appendMany2One([name, time, moves], tr)
+    this.appendMany2One([number, name, time, moves], tr)
     this.qualifierEls.push(tr)
   },
   updateEl: function (qualifier, inQualifierEls) {
